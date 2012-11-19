@@ -5,14 +5,13 @@
 //				to the minute/set signal from external.
 // Author: Joe Shang
 
-module reg_timer(reset, clock, state,
-				 one_second, minute_set, hour_set,
+module reg_timer(reset, clock, mode,
+				 minute_set, hour_set,
 	   			 second_data, minute_data, hour_data);
 
 	input reset;
 	input clock;
-	input state;
-	input one_second;
+	input mode;
 	input minute_set;
 	input hour_set;
 	output [7:0] second_data;
@@ -25,35 +24,59 @@ module reg_timer(reset, clock, state,
 
 	wire second_carry;
 	wire minute_carry;
-	wire hour_carry;
 
 	wire second_data;
 	wire minute_data;
 	wire hour_data;
 
-	// state: 0 -> Set Mode
-	//		  1 -> Timer Mode
-	assign second_pulse = state ? one_second : 0;
-	assign minute_pulse = state ? second_carry : minute_set;
-	assign hour_pulse	= state ? minute_carry : hour_set;	
+	reg one_second_pulse;
+	reg [25:0] counter;
+
+	parameter second_cnt = 52428800;
+
+	// Generate one second pulse
+	always @(posedge clock or negedge reset)
+	begin
+		if (!reset)
+			counter <= 0;
+		else
+			if (counter + 1 < second_cnt)
+			begin
+				counter <= counter + 1;
+				one_second_pulse <= 0;
+			end
+			else
+			begin
+				counter <= 0;
+				one_second_pulse <= 1;
+			end
+	end
+
+	assign second_carry = (second_data == 59) ? 1 : 0;
+	assign minute_carry = (minute_data == 59) ? 1 : 0;
+
+	// mode: 0 -> Set Mode, 1 -> Timer Mode. 
+	// At Timer Mode: minute pulse which decided by second carry must be 
+	// synchronized with second pulse, hour pulse which decided by minute carry
+	// must be synchronized with minute pulse.
+	assign second_pulse = mode ? one_second_pulse : 0;
+	assign minute_pulse = mode ? (second_pulse & second_carry) : minute_set;
+	assign hour_pulse	= mode ? (minute_pulse & minute_carry) : hour_set;	
 	
 	pulse_inc_cnt second(.reset(reset),
 						 .clock(clock),
 						 .pulse(second_pulse), 
-						 .data(second_data),
-						 .carry(second_carry));
+						 .data(second_data));
 
 	pulse_inc_cnt minute(.reset(reset),
 						 .clock(clock),
 						 .pulse(minute_pulse), 
-						 .data(minute_data),
-						 .carry(minute_carry));
+						 .data(minute_data));
 
 	pulse_inc_cnt 	hour(.reset(reset),
 						 .clock(clock),
 						 .pulse(hour_pulse), 
-						 .data(hour_data),
-						 .carry(hour_carry));
+						 .data(hour_data));
 	defparam hour.max_cnt = 23;
 
 endmodule
