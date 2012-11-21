@@ -14,9 +14,9 @@ module reg_timer(reset, clock, mode,
 	input mode;
 	input minute_set;
 	input hour_set;
-	output [7:0] second_data;
-	output [7:0] minute_data;
-	output [7:0] hour_data;
+	output [5:0] second_data;
+	output [5:0] minute_data;
+	output [5:0] hour_data;
 
 	wire second_pulse;
 	wire minute_pulse;
@@ -30,9 +30,10 @@ module reg_timer(reset, clock, mode,
 	wire hour_data;
 
 	reg one_second_pulse;
-	reg [25:0] counter;
+	reg [counter_width-1:0] counter;
 
 	parameter second_cnt = 52428800;
+	parameter counter_width = 26;
 
 	// Generate one second pulse
 	always @(posedge clock or negedge reset)

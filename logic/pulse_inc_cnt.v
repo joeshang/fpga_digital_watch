@@ -9,11 +9,11 @@ module pulse_inc_cnt(reset, clock, pulse, data);
 	input reset;
 	input clock;
 	input pulse;
-	output [data_width:0] data;
+	output [data_width-1:0] data;
 
-	reg [data_width:0] data;
+	reg [data_width-1:0] data;
 
-	parameter data_width = 7;	// the width of output data
+	parameter data_width = 6;	// the width of output data
 	parameter max_cnt = 59;		// the max counter of increasement
 	parameter inc_step = 1;		// the step of increasement
 
@@ -30,7 +30,7 @@ module pulse_inc_cnt(reset, clock, pulse, data);
 					data <= 0;
 				// no carry, register only increase 1
 				else
-					data <= data + 1'b1;
+					data <= data + inc_step;
 			end
 			// normal mode, just like a normal register
 			else

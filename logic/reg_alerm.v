@@ -10,11 +10,11 @@ module reg_alerm(reset, clock, minute_set, hour_set, second_data, minute_data, h
 	input minute_set;
 	input hour_set;
 	
-	output [7:0] second_data;
-	output [7:0] minute_data;
-	output [7:0] hour_data;
+	output [5:0] second_data;
+	output [5:0] minute_data;
+	output [5:0] hour_data;
 
-	wire [7:0] second_data;
+	wire [5:0] second_data;
 
 	assign second_data = 0;
 

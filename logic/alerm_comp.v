@@ -8,8 +8,8 @@ module alerm_comp(reset, clock, timer_data, alerm_data, alerm_enable, alerm_outp
 
 	input reset;
 	input clock;
-	input [data_width:0] timer_data;
-	input [data_width:0] alerm_data;
+	input [data_width-1:0] timer_data;
+	input [data_width-1:0] alerm_data;
 	input alerm_enable;
 	output alerm_output;
 
@@ -19,15 +19,16 @@ module alerm_comp(reset, clock, timer_data, alerm_data, alerm_enable, alerm_outp
 	reg current_state;
 	reg next_state;
 	reg alerm_output;
-	reg [25:0] counter;
+	reg [counter_width-1:0] counter;
 	reg [7:0] second;
 
 	parameter sleep_state = 0;
 	parameter alerm_state = 1;
 
-	parameter data_width = 23;
+	parameter data_width = 18;
 	parameter alerm_time = 60;
 	parameter second_cnt = 52428800;
+	parameter counter_width = 26;
 
 	always @(posedge clock or negedge reset)
 	begin
