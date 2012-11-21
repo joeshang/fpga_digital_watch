@@ -2,9 +2,14 @@ LOGIC_INCPATH = ../logic/
 LOGPATH = log/
 VCDPATH = vcd/
 FLAGS = -I$(LOGIC_INCPATH) -o
-TARGET = test_reg_timer test_reg_alerm test_pulse_inc_cnt test_pulse_maker test_alerm_comp
+TARGET = test_control test_reg_timer test_reg_alerm test_pulse_inc_cnt test_pulse_maker test_alerm_comp
 
 all:$(TARGET)
+
+test_control:test_control.v $(LOGIC_INCPATH)control.v $(LOGIC_INCPATH)reg_timer.v $(LOGIC_INCPATH)reg_alerm.v \
+	   	$(LOGIC_INCPATH)pulse_inc_cnt.v $(LOGIC_INCPATH)pulse_maker.v $(LOGIC_INCPATH)alerm_comp.v
+	iverilog $(FLAGS) test_control test_control.v  $(LOGIC_INCPATH)control.v $(LOGIC_INCPATH)reg_timer.v $(LOGIC_INCPATH)reg_alerm.v \
+	   	$(LOGIC_INCPATH)pulse_inc_cnt.v $(LOGIC_INCPATH)pulse_maker.v $(LOGIC_INCPATH)alerm_comp.v
 
 test_reg_timer:test_reg_timer.v $(LOGIC_INCPATH)reg_timer.v $(LOGIC_INCPATH)pulse_inc_cnt.v
 	iverilog $(FLAGS) test_reg_timer test_reg_timer.v $(LOGIC_INCPATH)reg_timer.v $(LOGIC_INCPATH)pulse_inc_cnt.v
@@ -22,6 +27,8 @@ test_alerm_comp:test_alerm_comp.v $(LOGIC_INCPATH)alerm_comp.v $(LOGIC_INCPATH)p
 	iverilog $(FLAGS) test_alerm_comp test_alerm_comp.v $(LOGIC_INCPATH)alerm_comp.v $(LOGIC_INCPATH)pulse_maker.v
 
 log:$(TARGET)
+	./test_control > $(LOGPATH)test_control.log
+	mv test_control.vcd $(VCDPATH)
 	./test_reg_timer > $(LOGPATH)test_reg_timer.log
 	mv test_reg_timer.vcd $(VCDPATH)
 	./test_reg_alerm > $(LOGPATH)test_reg_alerm.log
