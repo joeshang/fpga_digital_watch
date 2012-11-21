@@ -15,9 +15,9 @@ module test_reg_timer;
 	reg hour_set;
 
 	// define output result of test module
-	wire [7:0] second_data;
-	wire [7:0] minute_data;
-	wire [7:0] hour_data;
+	wire [5:0] second_data;
+	wire [5:0] minute_data;
+	wire [5:0] hour_data;
 
 	`define clock_period		2
 	`define second_cnt_period	4

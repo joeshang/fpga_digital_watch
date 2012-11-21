@@ -14,7 +14,7 @@ module test_control;
 	reg minute_set;
 	reg hour_set;
 	
-	wire [23:0] time_data;
+	wire [17:0] time_data;
 	wire alerm_equal;	
 
 	`define clock_period 2

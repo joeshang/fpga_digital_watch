@@ -8,8 +8,8 @@ module test_alerm_comp;
 
 	reg reset;
 	reg clock;
-	reg [23:0] timer_data;
-	reg [23:0] alerm_data;
+	reg [17:0] timer_data;
+	reg [17:0] alerm_data;
 	reg alerm_enable;
 	
 	wire alerm_output;

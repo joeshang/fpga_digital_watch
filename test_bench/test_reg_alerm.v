@@ -15,9 +15,9 @@ module test_reg_alerm;
 	reg hour_set;
 
 	// define output result of test module
-	wire [7:0] second_data;
-	wire [7:0] minute_data;
-	wire [7:0] hour_data;
+	wire [5:0] second_data;
+	wire [5:0] minute_data;
+	wire [5:0] hour_data;
 
 	reg_alerm alerm_data(.reset(reset),
 						 .clock(clock),

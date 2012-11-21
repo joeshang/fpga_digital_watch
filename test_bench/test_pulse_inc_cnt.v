@@ -17,7 +17,7 @@ module test_pulse_inc_cnt;
 	wire pulse;
 
 	// define output result of test module
-	wire [7:0] data;
+	wire [5:0] data;
 
 	pulse_inc_cnt timer(.reset(reset),
 						.clock(clock),
