@@ -2,7 +2,7 @@ LOGIC_INCPATH = ../logic/
 LOGPATH = log/
 VCDPATH = vcd/
 FLAGS = -I$(LOGIC_INCPATH) -o
-TARGET = test_control test_reg_timer test_reg_alerm test_pulse_inc_cnt test_pulse_maker test_alerm_comp
+TARGET = test_control test_reg_timer test_reg_alerm test_pulse_inc_cnt test_pulse_maker test_alerm_comp test_bin2bcd
 
 all:$(TARGET)
 
@@ -26,6 +26,9 @@ test_pulse_maker:test_pulse_maker.v $(LOGIC_INCPATH)pulse_maker.v
 test_alerm_comp:test_alerm_comp.v $(LOGIC_INCPATH)alerm_comp.v $(LOGIC_INCPATH)pulse_maker.v
 	iverilog $(FLAGS) test_alerm_comp test_alerm_comp.v $(LOGIC_INCPATH)alerm_comp.v $(LOGIC_INCPATH)pulse_maker.v
 
+test_bin2bcd:test_bin2bcd.v $(LOGIC_INCPATH)bin2bcd.v
+	iverilog $(FLAGS) test_bin2bcd test_bin2bcd.v $(LOGIC_INCPATH)bin2bcd.v
+
 log:$(TARGET)
 	./test_control > $(LOGPATH)test_control.log
 	mv test_control.vcd $(VCDPATH)
@@ -39,6 +42,8 @@ log:$(TARGET)
 	mv test_pulse_maker.vcd $(VCDPATH)
 	./test_alerm_comp > $(LOGPATH)test_alerm_comp.log
 	mv test_alerm_comp.vcd $(VCDPATH)
+	./test_bin2bcd > $(LOGPATH)test_bin2bcd.log
+	mv test_bin2bcd.vcd $(VCDPATH)
 
 clean:
 	rm -rf $(TARGET) $(LOGPATH)* $(VCDPATH)* *.vcd *.log
