@@ -1,10 +1,18 @@
+TOP_INCPATH = ../
 LOGIC_INCPATH = ../logic/
+DRIVER_INCPATH = ../driver/
 LOGPATH = log/
 VCDPATH = vcd/
 FLAGS = -I$(LOGIC_INCPATH) -o
-TARGET = test_control test_reg_timer test_reg_alerm test_pulse_inc_cnt test_pulse_maker test_alerm_comp test_bin2bcd
+TARGET = digital_watch
+TEST_BENCH = test_control test_reg_timer test_reg_alerm test_pulse_inc_cnt test_pulse_maker test_alerm_comp test_bin2bcd
 
-all:$(TARGET)
+all:$(TEST_BENCH)
+
+target:$(TARGET)
+
+digital_watch:$(TOP_INCPATH)digital_watch.v 
+	iverilog $(FLAGS) digital_watch $(TOP_INCPATH)digital_watch.v  $(LOGIC_INCPATH)control.v $(LOGIC_INCPATH)reg_timer.v $(LOGIC_INCPATH)reg_alerm.v $(LOGIC_INCPATH)pulse_inc_cnt.v $(LOGIC_INCPATH)pulse_maker.v $(LOGIC_INCPATH)alerm_comp.v $(LOGIC_INCPATH)bin2bcd.v $(DRIVER_INCPATH)trans_seg.v
 
 test_control:test_control.v $(LOGIC_INCPATH)control.v $(LOGIC_INCPATH)reg_timer.v $(LOGIC_INCPATH)reg_alerm.v \
 	   	$(LOGIC_INCPATH)pulse_inc_cnt.v $(LOGIC_INCPATH)pulse_maker.v $(LOGIC_INCPATH)alerm_comp.v
@@ -29,7 +37,7 @@ test_alerm_comp:test_alerm_comp.v $(LOGIC_INCPATH)alerm_comp.v $(LOGIC_INCPATH)p
 test_bin2bcd:test_bin2bcd.v $(LOGIC_INCPATH)bin2bcd.v
 	iverilog $(FLAGS) test_bin2bcd test_bin2bcd.v $(LOGIC_INCPATH)bin2bcd.v
 
-log:$(TARGET)
+log:$(TEST_BENCH)
 	./test_control > $(LOGPATH)test_control.log
 	mv test_control.vcd $(VCDPATH)
 	./test_reg_timer > $(LOGPATH)test_reg_timer.log
@@ -46,4 +54,4 @@ log:$(TARGET)
 	mv test_bin2bcd.vcd $(VCDPATH)
 
 clean:
-	rm -rf $(TARGET) $(LOGPATH)* $(VCDPATH)* *.vcd *.log
+	rm -rf $(TARGET) $(TEST_BENCH) $(LOGPATH)* $(VCDPATH)* *.vcd *.log
