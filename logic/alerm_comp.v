@@ -62,7 +62,6 @@ module alerm_comp(reset, clock, timer_data, alerm_data, alerm_enable, alerm_outp
 			sleep_state:
 			begin
 				alerm_output <= 1'b0;
-				second <= 0;
 			end
 			alerm_state:
 				alerm_output <= 1'b1;
@@ -81,15 +80,17 @@ module alerm_comp(reset, clock, timer_data, alerm_data, alerm_enable, alerm_outp
 		end
 		else
 		begin
-			if (counter + 1 < second_cnt)
-				counter <= counter + 1;
+			if (counter + 1'b1 < second_cnt)
+				counter <= counter + 1'b1;
 			else
 			begin
 				counter <= 0;
 
 				// Record alerm output time only in alerm state.
 				if (current_state == alerm_state)
-					second <= second + 1;
+					second <= second + 1'b1;
+				else
+					second <= 0;
 			end
 		end
 	end

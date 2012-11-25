@@ -1,5 +1,8 @@
 // Name: test_control
-// Description:
+// Description: You should add a parameter named second_cnt in control.v and
+//				deliver it to reg_timer and alerm_comp if you want to make
+//				this test bench available because the true second_cnt is 
+//				extremely big.
 // Author: Joe Shang
 
 `timescale 1ns / 1ns
@@ -16,6 +19,7 @@ module test_control;
 	
 	wire [17:0] time_data;
 	wire alerm_equal;	
+	wire am_pm_div;
 
 	`define clock_period 2
 	`define second_period 4
@@ -28,16 +32,15 @@ module test_control;
 					  	.minute_set(minute_set),
 					  	.hour_set(hour_set),
 					  	.time_data(time_data),
-					  	.alerm_equal(alerm_equal));
-	defparam test_module.second_cnt = `second_period;
+					  	.alerm_equal(alerm_equal),
+						.am_pm_div(am_pm_div));
+	//defparam test_module.second_cnt = `second_period;
 
 	initial
 	begin
 
 		$dumpfile("test_control.vcd");
 		$dumpvars(0, test_control);
-
-		//$monitor("  %d:%d:%d -> %d", time_data[23:16], time_data[15:8], time_data[7:0], alerm_equal);
 
 		reset = 0;
 		clock = 1;

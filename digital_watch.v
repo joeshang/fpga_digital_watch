@@ -13,11 +13,11 @@ module digital_watch(CLOCK_50, SW, KEY, LEDR, LEDG,
 		HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0);
 
 	input CLOCK_50;
-	input [1:0] KEY;
+	input [2:0] KEY;
 	input [17:0] SW;
 	output [8:8] LEDG;
 	output [17:17] LEDR;
-	output [6:0] HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0; 
+	output [0:6] HEX6, HEX5, HEX4, HEX3, HEX2, HEX1, HEX0; 
 
 	wire reset;
 	wire clock;
@@ -28,10 +28,9 @@ module digital_watch(CLOCK_50, SW, KEY, LEDR, LEDG,
 	wire [7:0] hour_bcd;
 	wire [17:0] logic_output;
 
-	// Output AM/PM display signal.
-	assign LEDG[8] = (logic_output[17:12] > 12) ? 1'b1 : 1'b0;
-
 	// Make clock stable by using PLL.
+	assign clock = CLOCK_50;
+	assign reset = KEY[2];
 
 	// Synchronize the external asychonized input.
 	pulse_maker syn_minute_set(.reset(reset),
@@ -52,7 +51,8 @@ module digital_watch(CLOCK_50, SW, KEY, LEDR, LEDG,
 						  .minute_set(minute_set),
 						  .hour_set(hour_set),
 						  .time_data(logic_output),
-						  .alerm_equal(LEDR[17]));
+						  .alerm_equal(LEDR[17]),
+						  .am_pm_div(LEDG[8]));
 	
 	// Convert logic output data to bcd format.
 	bin2bcd second_bin2bcd(.clock(clock),
@@ -71,27 +71,27 @@ module digital_watch(CLOCK_50, SW, KEY, LEDR, LEDG,
 	// Translate bcd to seg data format and output to related seg port.
 	trans_seg seg_second_high(.bcd_data(second_bcd[7:4]),
 							  .blank(1'b0),
-							  .common_anode(1'b0),
+							  .common_anode(1'b1),
 							  .seg_data(HEX1));
 	trans_seg  seg_second_low(.bcd_data(second_bcd[3:0]),
 							  .blank(1'b0),
-							  .common_anode(1'b0),
+							  .common_anode(1'b1),
 							  .seg_data(HEX0));
 	trans_seg seg_minute_high(.bcd_data(minute_bcd[7:4]),
 							  .blank(1'b0),
-							  .common_anode(1'b0),
+							  .common_anode(1'b1),
 							  .seg_data(HEX3));
 	trans_seg  seg_minute_low(.bcd_data(minute_bcd[3:0]),
 							  .blank(1'b0),
-							  .common_anode(1'b0),
+							  .common_anode(1'b1),
 							  .seg_data(HEX2));
 	trans_seg   seg_hour_high(.bcd_data(hour_bcd[7:4]),
 							  .blank(1'b0),
-							  .common_anode(1'b0),
+							  .common_anode(1'b1),
 							  .seg_data(HEX5));
 	trans_seg    seg_hour_low(.bcd_data(hour_bcd[3:0]),
 							  .blank(1'b0),
-							  .common_anode(1'b0),
+							  .common_anode(1'b1),
 							  .seg_data(HEX4));
 
 endmodule

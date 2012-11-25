@@ -7,9 +7,9 @@ module trans_seg(bcd_data, blank, common_anode, seg_data);
 	input blank;
 	input common_anode;
 	input [3:0] bcd_data;
-	output [6:0] seg_data;
+	output [0:6] seg_data;
 	
-	reg [6:0] seg_data;
+	reg [0:6] seg_data;
 
 	always @(bcd_data or blank or common_anode)
 	begin

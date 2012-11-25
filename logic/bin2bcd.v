@@ -18,7 +18,7 @@ module bin2bcd(clock, binary, high_bcd, low_bcd);
 	function [3:0] correct;
 	input [3:0] decade;
 	begin
-		correct = (decade >= 5) ? (decade + 3) : (decade);
+		correct = (decade >= 4'd5) ? (decade + 4'd3) : (decade);
 	end
 	endfunction
 

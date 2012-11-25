@@ -25,9 +25,9 @@ module reg_timer(reset, clock, mode,
 	wire second_carry;
 	wire minute_carry;
 
-	wire second_data;
-	wire minute_data;
-	wire hour_data;
+	wire [5:0] second_data;
+	wire [5:0] minute_data;
+	wire [5:0] hour_data;
 
 	reg one_second_pulse;
 	reg [counter_width-1:0] counter;
@@ -41,9 +41,9 @@ module reg_timer(reset, clock, mode,
 		if (!reset)
 			counter <= 0;
 		else
-			if (counter + 1 < second_cnt)
+			if (counter + 1'b1 < second_cnt)
 			begin
-				counter <= counter + 1;
+				counter <= counter + 1'b1;
 				one_second_pulse <= 0;
 			end
 			else
@@ -53,14 +53,14 @@ module reg_timer(reset, clock, mode,
 			end
 	end
 
-	assign second_carry = (second_data == 59) ? 1 : 0;
-	assign minute_carry = (minute_data == 59) ? 1 : 0;
+	assign second_carry = (second_data == 59) ? 1'b1 : 1'b0;
+	assign minute_carry = (minute_data == 59) ? 1'b1 : 1'b0;
 
 	// mode: 0 -> Set Mode, 1 -> Timer Mode. 
 	// At Timer Mode: minute pulse which decided by second carry must be 
 	// synchronized with second pulse, hour pulse which decided by minute carry
 	// must be synchronized with minute pulse.
-	assign second_pulse = mode ? one_second_pulse : 0;
+	assign second_pulse = mode ? one_second_pulse : 1'b0;
 	assign minute_pulse = mode ? (second_pulse & second_carry) : minute_set;
 	assign hour_pulse	= mode ? (minute_pulse & minute_carry) : hour_set;	
 	

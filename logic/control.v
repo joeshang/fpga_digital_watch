@@ -1,9 +1,10 @@
 // Name: control
-// Description:
+// Description: Handle all external set signal, switch digital watch's mode
+//				and output related data in various mode.
 // Author: Joe Shang
 
 module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
-			   time_data, alerm_equal);
+			   time_data, alerm_equal, am_pm_div);
 
 	input reset;
 	input clock;
@@ -13,6 +14,7 @@ module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
 	input minute_set;
 	input hour_set;
 	output alerm_equal;
+	output am_pm_div;
 	output [time_width-1:0] time_data;
 
 	reg [1:0] current_state;
@@ -44,9 +46,6 @@ module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
 
 	parameter time_width = 18;
 	
-	// TEST
-	parameter second_cnt = 4;
-
 	// FSM:Changing state.
 	always @(posedge clock or negedge reset)
 	begin
@@ -102,9 +101,9 @@ module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
 	begin
 		if (!reset)
 		begin
-			output_sel <= 1;
-			timer_mode <= 1;
-			alerm_open <= 1;
+			output_sel <= 1'b1;
+			timer_mode <= 1'b1;
+			alerm_open <= 1'b1;
 		end
 		else
 		begin
@@ -112,36 +111,38 @@ module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
 				
 				timer_state:
 				begin
-					output_sel <= 1;	// Output Timer/Set register data.
-					timer_mode <= 1;	// Timer/Set register perform at timer mode.
-					alerm_open <= 1;	// Alerm comparation open.
+					output_sel <= 1'b1;	// Output Timer/Set register data.
+					timer_mode <= 1'b1;	// Timer/Set register perform at timer mode.
+					alerm_open <= 1'b1;	// Alerm comparation open.
 				end
 
 				set_state:
 				begin
-					output_sel <= 1;	// Output Timer/Set register data.
-					timer_mode <= 0;	// Timer/Set register perform at set mode. 
-					alerm_open <= 0;	// Alerm comparation close.
+					output_sel <= 1'b1;	// Output Timer/Set register data.
+					timer_mode <= 1'b0;	// Timer/Set register perform at set mode. 
+					alerm_open <= 1'b0;	// Alerm comparation close.
 				end
 
 				alerm_state:
 				begin
-					output_sel <= 0;	// Output Alerm register data.
-					timer_mode <= 1;	// Timer/Set register perform at timer mode.
-					alerm_open <= 0;	// Alerm comparation close.
+					output_sel <= 1'b0;	// Output Alerm register data.
+					timer_mode <= 1'b1;	// Timer/Set register perform at timer mode.
+					alerm_open <= 1'b0;	// Alerm comparation close.
 				end
 
 			endcase
 		end
 	end
 
+	// ---------------- Control Glue Logic ------------------
 	// sel = 1, external set signal access in timer register.
-	assign timer_minute_set = output_sel ? minute_set : 0;
-	assign timer_hour_set   = output_sel ? hour_set   : 0;
+	assign timer_minute_set = output_sel ? minute_set : 1'b0;
+	assign timer_hour_set   = output_sel ? hour_set   : 1'b0;
 	// sel = 0, external set signal access in alerm register.
-	assign alerm_minute_set = output_sel ? 0 : minute_set;
-	assign alerm_hour_set	= output_sel ? 0 : hour_set;
+	assign alerm_minute_set = output_sel ? 1'b0 : minute_set;
+	assign alerm_hour_set	= output_sel ? 1'b0 : hour_set;
 
+	// ---------------- Output Glue Logic ------------------
 	// Two-in-One selector.
 	// sel = 1, output timer data.
 	// sel = 0, output alerm data.
@@ -150,10 +151,15 @@ module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
 	assign timer_output = {timer_hour, timer_minute, timer_second};
 	assign alerm_output = {alerm_hour, alerm_minute, alerm_second};
 
+	// Divide AM/PM.
+	// AM, hour <= 12, output 0.
+	// PM, hour > 12, output 1.
+	assign am_pm_div = (timer_hour > 12) ? 1'b1 : 1'b0;
+
 	// Alerm comparator.
 	// alerm_open = 1, open alerm comparation.
 	// alerm_open = 0, close alerm comparation.
-	assign alerm_enable = alerm_open ? alerm_switch : 0;
+	assign alerm_enable = alerm_open ? alerm_switch : 1'b0;
 
 	reg_alerm alerm_data_reg(.reset(reset),
 							 .clock(clock),
@@ -178,8 +184,5 @@ module control(reset, clock, set, alerm, alerm_switch, minute_set, hour_set,
 							.alerm_data(alerm_output),
 							.alerm_enable(alerm_enable),
 							.alerm_output(alerm_equal));
-	// TEST
-	defparam timer_data_reg.second_cnt = second_cnt;
-	defparam comp_module.second_cnt = second_cnt;
 
 endmodule
